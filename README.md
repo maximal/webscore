@@ -22,6 +22,22 @@ Visit [webscore.maximals.ru](https://webscore.maximals.ru) and try to upload a M
 * [Vite](https://vite.dev/) bundler
 * [Mago](https://mago.carthage.software/) PHP toolchain
 
+## Build
+
+Backend:
+
+```shell
+composer install
+```
+
+Frontend and SSR bundles:
+
+```shell
+bun install
+bun run build
+bun run build:ssr
+```
+
 ## Author
 
 * https://github.com/maximal
