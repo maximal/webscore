@@ -27,17 +27,21 @@ services:
       start_period: 5s
     restart: unless-stopped
 
-  queue:
+  queue_1:
     <<: *app-service-template
     # Debug (listening)
-    command: php /var/www/artisan queue:listen --timeout=0
-    #command: bash -c "
-    #  php /var/www/artisan rabbitmq:queue-declare default &&
-    #  php /var/www/artisan queue:listen --timeout=0"
+    #command: php /var/www/artisan queue:listen --timeout=0
     # Production (working)
-    #command: bash -c "
-    #  php /var/www/artisan rabbitmq:queue-declare default &&
-    #  php /var/www/artisan queue:work --timeout=0"
+    command: php /var/www/artisan queue:work --timeout=0
+    healthcheck:
+      test: [ 'NONE' ]
+
+  queue_2:
+    <<: *app-service-template
+    # Debug (listening)
+    #command: php /var/www/artisan queue:listen --timeout=0
+    # Production (working)
+    command: php /var/www/artisan queue:work --timeout=0
     healthcheck:
       test: [ 'NONE' ]
 

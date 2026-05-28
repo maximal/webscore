@@ -101,8 +101,9 @@ final class Editor
 	private static function result(string $command): array
 	{
 		$full = 'xvfb-run -a ' . $command;
-		Log::debug('Running command: ' . $full);
-		$result = Process::timeout(120)->run($full);
+		$timeout = config('editor.timeout', 120);
+		Log::debug('Running command (with timeout ' . $timeout . '): ' . $full);
+		$result = Process::timeout($timeout)->run($full);
 		return [$result->exitCode(), $result->output(), $result->errorOutput()];
 	}
 }

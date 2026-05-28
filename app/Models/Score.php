@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -148,15 +149,8 @@ final class Score extends Model
 		$model->file_hash = hash_file('sha3-256', $file->getRealPath());
 		$model->disk = 'local';
 		$model->disk_public = 'public';
-		$dir =
-			'scores/'
-			. substr($model->file_hash, 0, 2)
-			. '/'
-			. substr($model->file_hash, 2, 2)
-			. '/'
-			. $model->id;
 		$storedUrl = Storage::disk($model->disk)->putFileAs(
-			$dir,
+			$model->dir,
 			$file,
 			'score.' . strtolower($file->getClientOriginalExtension()),
 		);
@@ -222,5 +216,34 @@ final class Score extends Model
 		return $length < (60 * 60)
 			? sprintf('%d:%02d', (int) ($length / 60), $length % 60)
 			: sprintf('%d:%02d:%02d', (int) (($length / 60) / 60), (int) ($length / 60) % 60, $length % 60);
+	}
+
+	public function deleteFiles(): void
+	{
+		$privateDisk = Storage::disk($this->disk);
+		$publicDisk = Storage::disk($this->disk_public);
+		$dir = $this->dir;
+		$privateDisk->deleteDirectory($dir);
+		$publicDisk->deleteDirectory($dir);
+
+		$parent = $dir . '/..';
+		$otherDirs = $privateDisk->directories($parent);
+		if (count($otherDirs) === 0) {
+			$privateDisk->deleteDirectory($parent);
+		}
+		$otherDirs = $publicDisk->directories($parent);
+		if (count($otherDirs) === 0) {
+			$publicDisk->deleteDirectory($parent);
+		}
+
+		$grandParent = $dir . '/../..';
+		$otherDirs = $privateDisk->directories($grandParent);
+		if (count($otherDirs) === 0) {
+			$privateDisk->deleteDirectory($grandParent);
+		}
+		$otherDirs = $publicDisk->directories($grandParent);
+		if (count($otherDirs) === 0) {
+			$publicDisk->deleteDirectory($grandParent);
+		}
 	}
 }

@@ -65,10 +65,10 @@ return [
 			'driver' => 'eloquent',
 			'model' => env('AUTH_MODEL', User::class),
 		],
-		// 'users' => [
-		//     'driver' => 'database',
-		//     'table' => 'users',
-		// ],
+		//'users' => [
+		//	'driver' => 'database',
+		//	'table' => 'users',
+		//],
 	],
 
 	/*

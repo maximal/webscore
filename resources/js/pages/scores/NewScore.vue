@@ -2,14 +2,14 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import axios, { type  AxiosError, type AxiosResponse } from 'axios';
+import axios, { type  AxiosError, type AxiosProgressEvent, type AxiosResponse } from 'axios';
 import type { Score } from '@/types/Score';
 import { score } from '@/routes';
 
-const dropZone = ref<HTMLElement>();
 const fileInput = ref<HTMLInputElement>();
 const drag = ref<boolean>(false);
 const error = ref<string>('');
+const progress = ref<number | null>(null);
 
 function openInput(): void {
 	fileInput.value?.click();
@@ -23,6 +23,10 @@ interface ErrorsBag {
 }
 
 function sendFile(file: File): void {
+	if (progress.value !== null) {
+		return;
+	}
+
 	error.value = '';
 
 	if (file.size > 10 * 1024 * 1024 || file.size < 1024) {
@@ -30,10 +34,18 @@ function sendFile(file: File): void {
 		return;
 	}
 
+	progress.value = 0;
 	const form = new FormData();
 	form.append('file', file);
 	axios
-		.post('/api/v1/demo', form)
+		.post('/api/v1/demo', form, {
+			onUploadProgress: (progressEvent: AxiosProgressEvent): void => {
+				if (!progressEvent.total) {
+					return;
+				}
+				progress.value = 100.0 * progressEvent.loaded / progressEvent.total;
+			}
+		})
 		.then((response: AxiosResponse<Score>) => {
 			const model = response.data;
 			error.value = '';
@@ -42,6 +54,9 @@ function sendFile(file: File): void {
 		.catch((err: AxiosError<ErrorsBag>) => {
 			error.value = err.response ? err.response.data.message : '';
 			console.log(error.value);
+		}).
+		finally(() => {
+			progress.value = null;
 		});
 }
 
@@ -64,9 +79,11 @@ function onDropZoneDragLeave(): void {
 }
 
 function onDropZoneDrop(event: DragEvent): void {
-	if (event.dataTransfer?.files) {
-		sendFile(event.dataTransfer?.files[0])
+	const file = event.dataTransfer?.files[0];
+	if (!file) {
+		return;
 	}
+	sendFile(file);
 }
 </script>
 
@@ -76,7 +93,6 @@ function onDropZoneDrop(event: DragEvent): void {
 
 		<form @submit.prevent="submit">
 			<div
-				ref="dropZone"
 				class="dropzone"
 				:class="{ over: drag }"
 				@dragover.prevent="onDropZoneDragOver"
@@ -92,8 +108,17 @@ function onDropZoneDrop(event: DragEvent): void {
 					:class="{ 'is-invalid': error !== '' }"
 					id="file"
 					type="file"
+					:disabled="progress !== null"
 					@change="submit" />
 				<div v-if="error" class="invalid-feedback">{{ error }}</div>
+				<div
+					v-if="progress !== null"
+					class="progress mt-3" role="progressbar"
+					:aria-valuenow="progress"
+					:aria-valuemin="0"
+					:aria-valuemax="100">
+					<div class="progress-bar" :style="`width: ${progress}%`" />
+				</div>
 			</div>
 		</form>
 	</AppLayout>
@@ -113,9 +138,6 @@ function onDropZoneDrop(event: DragEvent): void {
 
 	&.over {
 		border: 4px dashed var(--bs-focus-ring-color);
-	}
-
-	input {
 	}
 }
 </style>
