@@ -1,0 +1,64 @@
+####
+# Mago configuration
+# https://mago.carthage.software/tools/overview
+####
+#:schema https://mago.carthage.software/latest/schema.json
+version = "1"
+php-version = "8.5"
+
+[source]
+workspace = "."
+#paths = ["app", "database/factories", "database/seeders", "tests"]
+includes = ["vendor"]
+excludes = ["bootstrap/cache", "storage"]
+
+[source.glob]
+literal-separator = true
+
+[formatter]
+preset = "default"
+use-tabs = true
+print-width = 100
+
+[linter]
+integrations = ["laravel", "pest"]
+
+[linter.rules]
+strict-types = { enabled = false }
+ambiguous-function-call = { enabled = false }
+literal-named-argument = { enabled = false }
+halstead = { effort-threshold = 7000 }
+no-is-null = { enabled = true }
+prefer-explode-over-preg-split = { enabled = true }
+switch-continue-to-break = { enabled = true }
+prefer-self-return-type = { enabled = true }
+no-alternative-syntax = { enabled = true }
+no-short-bool-cast = { enabled = true }
+no-literal-namespace-string = { enabled = true }
+sorted-integer-keys = { enabled = true }
+require-namespace = { enabled = true }
+no-parameter-shadowing = { enabled = true }
+prefer-array-spread = { enabled = true }
+no-array-accumulation-in-loop = { enabled = true }
+no-iterator-to-array-in-foreach = { enabled = true }
+no-unused-global = { enabled = true }
+no-unused-static = { enabled = true }
+no-dead-store = { enabled = true }
+no-redundant-else = { enabled = true }
+
+[analyzer]
+plugins = []
+find-unused-definitions = true
+find-unused-expressions = true
+analyze-dead-code = true
+memoize-properties = true
+strict-array-index-existence = true
+check-throws = true
+unchecked-exceptions = ["Error", "LogicException"]
+unchecked-exception-classes = []
+check-missing-override = true
+find-unused-parameters = true
+strict-list-index-checks = true
+no-boolean-literal-comparison = true
+check-missing-type-hints = true
+register-super-globals = true

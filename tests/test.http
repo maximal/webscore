@@ -1,0 +1,56 @@
+### Health
+# @no-cookie-jar
+GET http://localhost/api/v1/health
+
+###
+GET http://localhost/api/v1/demo
+
+### Create Score
+# @no-cookie-jar
+POST http://localhost/api/v1/demo
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="Колыбельная медведицы.mscz"
+
+< ../score_1_Колыбельная медведицы.mscz
+--WebAppBoundary--
+
+
+
+### Create Bigger Score 2
+# @no-cookie-jar
+POST http://localhost/api/v1/demo
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="Sonate_No._14_Moonlight_3rd_Movement.mscz"
+
+< ../score_2_Sonate_No._14_Moonlight_3rd_Movement.mscz
+--WebAppBoundary--
+
+
+
+### Create Bigger Score 3
+# @no-cookie-jar
+POST http://localhost/api/v1/demo
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="Draft_Symphony_Number_3_Opus_30_by_etc.mscz"
+
+< ../score_3_Draft_Symphony_Number_3_Opus_30_by_etc.mscz
+--WebAppBoundary--
+
+
+
+### Create Bigger Score 4
+# @no-cookie-jar
+POST http://localhost/api/v1/demo
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="The_Four_Seasons_Complete.mscz"
+
+< ../score_4_The_Four_Seasons_Complete.mscz
+--WebAppBoundary--
