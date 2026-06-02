@@ -28,7 +28,7 @@
 		"jcupitt/vips": "^2.6.1",
 		"inertiajs/inertia-laravel": "^3.1",
 		"laravel/fortify": "^1.37.2",
-		"laravel/framework": "^13.12",
+		"laravel/framework": "^13.13",
 		"laravel/octane": "^2.17.4",
 		"laravel/tinker": "^3.0.2",
 		"laravel/wayfinder": "^0.1.20"
@@ -38,7 +38,7 @@
 		"larastan/larastan": "@stable",
 		"maximal/gitlab-code-quality": "@stable",
 		"laravel/pail": "^1.2.7",
-		"laravel/pao": "^1.0.6",
+		"laravel/pao": "^1.1.0",
 		"mockery/mockery": "^1.6.12",
 		"nunomaduro/collision": "^8.9.4",
 		"pestphp/pest": "@stable",

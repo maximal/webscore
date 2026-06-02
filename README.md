@@ -4,7 +4,7 @@ Online music sheets player and catalog for [MuseScore](https://musescore.org/) f
 
 ## Demo
 
-Visit [webscore.maximals.ru](https://webscore.maximals.ru) and try to upload a MSCZ file.
+Visit [webscore.maximals.ru](https://webscore.maximals.ru) and upload a MSCZ file.
 
 ## Stack
 

@@ -26,10 +26,8 @@ onMounted(() => {
 			.catch((error: AxiosError) => {
 				console.error(error);
 			});
-	}, 2_000);
+	}, 3_000);
 });
-
-
 </script>
 
 <template>

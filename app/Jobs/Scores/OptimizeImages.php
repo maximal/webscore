@@ -6,11 +6,13 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
+use Override;
 
 //use Jcupitt\Vips\Image;
 
 class OptimizeImages extends Job
 {
+	#[Override]
 	public function handle(): void
 	{
 		Log::info(__CLASS__ . ' started');

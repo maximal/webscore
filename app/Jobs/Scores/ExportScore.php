@@ -15,8 +15,7 @@ use SimpleXMLElement;
 
 class ExportScore extends Job
 {
-	private const int EDITOR_DPI = 360;
-	private const int IMAGE_DPI = 360;
+	private const int IMAGE_DPI = 120;
 
 	#[Override]
 	public function handle(): void
@@ -99,7 +98,8 @@ class ExportScore extends Job
 	{
 		$extension = strtolower($extension);
 		$dir = dirname($this->score->file);
-		$tempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('score_', true) . '.' . $extension;
+		$tempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR .
+			uniqid('score_', true) . '.' . $extension;
 		if (!Editor::exportScore($this->filePath, $tempFile)) {
 			return false;
 		}
@@ -174,9 +174,9 @@ class ExportScore extends Job
 
 		// Эскиз файла из первой страницы в PNG
 		if (count($json->pngs ?? []) > 0) {
-			$preview = Image::newFromBuffer(base64_decode($json->pngs[0]))->thumbnail_image(512, [
-				'size' => 'VIPS_SIZE_DOWN',
-			]);
+			$firstPage = Image::newFromBuffer(base64_decode($json->pngs[0]));
+			Log::info('First page dimensions: ' . $firstPage->width . '×' . $firstPage->height);
+			$preview = $firstPage->thumbnail_image(512, ['size' => 'VIPS_SIZE_DOWN']);
 			$path = $baseDir . 'thumbnail.png';
 			if ($publicDisk->put($path, $preview->writeToBuffer('.png'))) {
 				$this->score->thumbnail = Storage::url($path);
@@ -200,13 +200,11 @@ class ExportScore extends Job
 		$pageHeightPx = ($pageHeightMm * self::IMAGE_DPI) / 25.4;
 
 		// Absolute pixels to relative units (0..100 %)
-		$xScaleFactor = ($pageWidthPx * ((12 * self::EDITOR_DPI) / self::IMAGE_DPI)) / 100.0;
-		$yScaleFactor = ($pageHeightPx * ((12 * self::EDITOR_DPI) / self::IMAGE_DPI)) / 100.0;
+		$xScaleFactor = 12 * $pageWidthPx / 100.0;
+		$yScaleFactor = 12 * $pageHeightPx / 100.0;
 
 		// Расположения тактов по страницам
-		//File::put($baseDir . 'spos.xml', base64_decode($json->sposXML));
-		$xml = base64_decode($json->mposXML);
-		$score = new SimpleXMLElement($xml);
+		$score = new SimpleXMLElement(base64_decode($json->mposXML));
 		$positions = [];
 		foreach ($score->elements->element as $element) {
 			$attributes = $element->attributes();
