@@ -12,7 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Override;
 
-class ClearGuestScoresJob extends Job
+final class ClearGuestScoresJob extends Job
 {
 	#[Override]
 	public function handle(): void

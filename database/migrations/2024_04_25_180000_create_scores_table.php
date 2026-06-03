@@ -53,8 +53,8 @@ return new class extends Migration {
 			$table->unsignedSmallInteger('measures')->nullable();
 			$table->unsignedSmallInteger('pages')->nullable();
 			$table->unsignedSmallInteger('parts')->nullable();
-			$table->unsignedSmallInteger('page_height')->nullable();
 			$table->unsignedSmallInteger('page_width')->nullable();
+			$table->unsignedSmallInteger('page_height')->nullable();
 			$table->boolean('page_twosided')->nullable();
 			$table->boolean('is_valid')->nullable();
 			$table->string('musescore_version', 32)->nullable();

@@ -10,7 +10,7 @@ use Override;
 
 //use Jcupitt\Vips\Image;
 
-class OptimizeImages extends Job
+final class OptimizeImages extends Job
 {
 	#[Override]
 	public function handle(): void

@@ -13,7 +13,7 @@ use Jcupitt\Vips\Image;
 use Override;
 use SimpleXMLElement;
 
-class ExportScore extends Job
+final class ExportScore extends Job
 {
 	private const int IMAGE_DPI = 120;
 
@@ -221,7 +221,8 @@ class ExportScore extends Job
 		foreach ($score->events->event as $event) {
 			$attributes = $event->attributes();
 			$id = (int) $attributes->elid + 1;
-			$positions[$id]['position'] = (int) $attributes->position;
+			$position = (int) $attributes->position;
+			$positions[$id]['positions'][] = $position;
 		}
 		$this->score->positions = array_values($positions);
 

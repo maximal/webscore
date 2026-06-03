@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 use Override;
 use RuntimeException;
 
-class GetScoreMeta extends Job
+final class GetScoreMeta extends Job
 {
 	#[Override]
 	public function handle(): void

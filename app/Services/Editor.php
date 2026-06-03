@@ -53,11 +53,13 @@ final class Editor
 	public static function getVersion(): ?string
 	{
 		$output = self::output(self::BASE . ' --long-version') ?? '';
-		if (!preg_match('/Version\s*([\d.]+);\s*Build\s+([0-9a-f]+)/i', $output, $match)) {
+		if (!preg_match('/Version\s*([\d.]+);\s*Build(\s+([0-9a-f]+))?/i', $output, $match)) {
 			return null;
 		}
 		// version + build hash
-		return $match[1] . '+' . $match[2];
+		// or
+		// version
+		return isset($match[3]) ? ($match[1] . '+' . $match[3]) : $match[1];
 	}
 
 	private static function json(string $command): ?object

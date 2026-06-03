@@ -172,7 +172,7 @@
 				<span class="text-body-secondary">Pages: </span>
 				{{ model.pages }}
 				<small class="text-body-secondary">
-					({{ getPageSizeText(model.page_width, model.page_height) }})
+					({{ pageSizeText(model.page_width, model.page_height) }})
 				</small>
 			</p>
 			<p v-if="model.duration !== null" class="duration mb-2">
@@ -199,20 +199,22 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted, ref } from 'vue';
 import AccessInput from '@/components/AccessInput.vue';
 import CommentsWidget from '@/components/CommentsWidget.vue';
+import DownloadWidget from '@/pages/scores/partials/DownloadWidget.vue';
 import DurationWidget from '@/components/DurationWidget.vue';
 import KeyWidget from '@/components/KeyWidget.vue';
 import RatingWidget from '@/components/RatingWidget.vue';
 import RouteLink from '@/components/RouteLink.vue';
-import DownloadWidget from '@/pages/scores/partials/DownloadWidget.vue';
+import SideBarLayout from '@/layouts/SideBarLayout.vue';
 import SpeedWidget from '@/pages/scores/partials/SpeedWidget.vue';
-import type { MeasurePosition } from '@/types/MeasurePosition';
+import type { MeasurePosition, PositionMeasure } from '@/types/MeasurePosition';
 import type { Page } from '@/types/Page';
 import type { Score } from '@/types/Score';
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
-import SideBarLayout from '@/layouts/SideBarLayout.vue';
+import { pageSizeText } from '@/lib/page-sizes';
+import { TimerEvent } from 'concurrently';
 
 const props = defineProps<{
 	model: Score;
@@ -221,10 +223,11 @@ const props = defineProps<{
 }>();
 
 const pages = ref<Page[]>();
-const measuresMap = ref({} as any);
-const pageMeasuresMap = ref({} as any);
-const oggFile = ref<string>('/storage/' + props.model.dir + '/score.ogg');
-const mp3File = ref<string>('/storage/' + props.model.dir + '/score.mp3');
+const measuresMap = ref<Record<number, MeasurePosition>>({});
+const pageMeasuresMap = ref<Record<number, MeasurePosition[]>>({});
+const allPositions = ref<PositionMeasure[]>([]);
+const oggFile = ref<string>(`/storage/${props.model.dir}/score.ogg`);
+const mp3File = ref<string>(`/storage/${props.model.dir}/score.mp3`);
 const item = ref<Score>(props.model);
 const showEditor = ref<boolean>(false);
 const audio = ref<HTMLAudioElement>();
@@ -232,40 +235,54 @@ const currentSpeed = ref<number>(1);
 const pagesContainer = ref<HTMLElement>();
 
 onMounted(() => {
+	buildMaps();
+
+	//pagesContainer.value?.addEventListener('scroll', () => {
+	//	console.log(pagesContainer.value?.scrollTop);
+	//});
+});
+
+function buildMaps(): void {
+	const measuresMapLocal: Record<number, MeasurePosition> = {};
+	const pageMeasuresMapLocal: Record<number, MeasurePosition[]> = {};
+	const allPositionsLocal: PositionMeasure[] = [];
 	for (const measure of props.model.positions ?? []) {
-		measuresMap.value[measure.id] = measure;
+		measuresMapLocal[measure.id] = measure;
 		const page = measure.page;
-		if (pageMeasuresMap.value[page]) {
-			pageMeasuresMap.value[page].push(measure);
+		if (pageMeasuresMapLocal[page]) {
+			pageMeasuresMapLocal[page].push(measure);
 		} else {
-			pageMeasuresMap.value[page] = [measure];
+			pageMeasuresMapLocal[page] = [measure];
+		}
+		for (const position of measure.positions) {
+			allPositionsLocal.push({ position: position, id: measure.id });
 		}
 	}
+	allPositionsLocal.sort((a, b) => a.position - b.position);
 
-	const result = [];
+	measuresMap.value = measuresMapLocal;
+	pageMeasuresMap.value = pageMeasuresMapLocal;
+	allPositions.value = allPositionsLocal;
+
+	const pagesLocal = [];
 	for (let page = 1; page <= (props.model.pages ?? 0); page++) {
-		result.push({
+		pagesLocal.push({
 			number: page,
 			image: `/storage/${props.model.dir}/page-${page}.svg`,
 			measures: pageMeasuresMap.value[page],
 		});
 	}
-	pages.value = result;
-
-
-	pagesContainer.value?.addEventListener('scroll', () => {
-		console.log(pagesContainer.value?.scrollTop);
-	});
-});
-
-function onTimeUpdate(event: any) {
-	highlightMeasure(findMeasure(Math.round(event.target.currentTime * 1000)), true);
+	pages.value = pagesLocal;
 }
 
-function onMeasureClick(id: number) {
+function onTimeUpdate(event: any): void {
+	highlightMeasure(findMeasure(Math.round(event.target.currentTime * 1_000)), true);
+}
+
+function onMeasureClick(id: number): void {
 	highlightMeasure(id, true);
 	if (audio.value) {
-		audio.value.currentTime = measuresMap.value[id].position / 1000.0;
+		audio.value.currentTime = measuresMap.value[id].positions[0] / 1_000.0;
 	}
 }
 
@@ -310,10 +327,10 @@ function scrollMeasureIntoView(element: HTMLElement): void {
 	}
 
 	const container = pagesContainer.value;
-	const elementTop = element.offsetTop;
+	//const elementTop = element.offsetTop;
 	const elementHeight = element.offsetHeight;
-	const elementBottom = elementTop + element.offsetHeight;
-	const containerScrollTop = container.scrollTop;
+	//const elementBottom = elementTop + element.offsetHeight;
+	//const containerScrollTop = container.scrollTop;
 	const containerHeight = container.clientHeight;
 
 	/*
@@ -336,13 +353,13 @@ function scrollMeasureIntoView(element: HTMLElement): void {
 
 function findMeasure(position: number): number {
 	let found = 1;
-	for (const measure of props.model.positions ?? []) {
-		if (position < measure.position) {
+	for (const current of allPositions.value) {
+		if (position < current.position) {
 			return found;
 		}
-		found = measure.id;
+		found = current.id;
 	}
-	return measuresMap.value.length;
+	return found;
 }
 
 function getMeasurePositionStyleString(measure: MeasurePosition): string {
@@ -351,10 +368,10 @@ function getMeasurePositionStyleString(measure: MeasurePosition): string {
 
 function getMeasurePosition(measure: MeasurePosition): object {
 	return {
-		top: `${measure.y  }%`,
-		left: `${measure.x  }%`,
-		width: `${measure.sx  }%`,
-		height: `${measure.sy  }%`,
+		top: `${measure.y}%`,
+		left: `${measure.x}%`,
+		width: `${measure.sx}%`,
+		height: `${measure.sy}%`,
 	};
 }
 
@@ -389,40 +406,9 @@ function setCurrentSpeed(speed: number): void {
 	}
 	currentSpeed.value = speed;
 }
-
-function getPageSizeText(width: number, height: number): string {
-	let predefined = '';
-	// https://paper-size.com/c/a-paper-sizes.html
-	// https://www.iso.org/standard/36631.html
-	// https://papersizes.io/us/legal.html
-	if (width >= 419 && width <= 421 && height >= 593 && height <= 595) {
-		// ~ 420 × 594 mm
-		predefined = 'A2, ';
-	} else if (width >= 296 && width <= 298 && height >= 419 && height <= 421) {
-		// ~ 297 × 420 mm
-		predefined = 'A3, ';
-	} else if (width >= 209 && width <= 211 && height >= 296 && height <= 298) {
-		// ~ 210 × 297 mm
-		predefined = 'A4, ';
-	} else if (width >= 147 && width <= 149 && height >= 209 && height <= 211) {
-		// ~ 148 × 210 mm
-		predefined = 'A5, ';
-	} else if (width >= 104 && width <= 106 && height >= 147 && height <= 149) {
-		// ~ 105 × 148 mm
-		predefined = 'A6, ';
-	} else if (width >= 215 && width <= 217 && height >= 355 && height <= 357) {
-		// ~ 216 × 356 mm
-		predefined = 'Legal, ';
-	}
-	return `${predefined}${width}×${height} mm`;
-}
 </script>
 
 <style lang="scss" scoped>
-section {
-	//margin-bottom: 2em;
-}
-
 .audio {
 	//margin-bottom: 1rem;
 

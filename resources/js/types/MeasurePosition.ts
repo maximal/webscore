@@ -4,6 +4,11 @@ export interface MeasurePosition {
 	y: number;
 	sx: number;
 	sy: number;
-	position: number;
 	page: number;
+	positions: number[];
+}
+
+export interface PositionMeasure {
+	position: number;
+	id: number;
 }
