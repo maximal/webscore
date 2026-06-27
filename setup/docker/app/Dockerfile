@@ -27,7 +27,7 @@ RUN apk update  &&  apk upgrade  &&  apk add --update --no-interactive \
 	# Video and Audio Tools \
 	#ffmpeg \
 	# VIPS tools \
-	vips libffi vips-dev vips-heif vips-jxl vips-poppler \
+	vips libffi vips-heif vips-jxl vips-poppler \
 	# Virtual Framebuffer Display for programs with GUI \
 	xvfb xvfb-run \
 	# Libraries for running MuseScore \

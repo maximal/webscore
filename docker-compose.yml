@@ -11,12 +11,10 @@ services:
       - ./setup/docker/app/php.ini:/etc/php85/conf.d/php-settings.ini
       # Alpine FrankenPHP
       - ./setup/docker/app/php.ini:/usr/local/etc/php/conf.d/php-settings.ini
-      #- janus_bin:/usr/local/bin_copy
     working_dir: /var/www
     depends_on:
       - database
       #- rabbit
-      #- janus
       #- storage
       #- storage2
     healthcheck:
@@ -33,6 +31,7 @@ services:
     #command: php /var/www/artisan queue:listen --timeout=0
     # Production (working)
     command: php /var/www/artisan queue:work --timeout=0
+    ports: [ ]
     healthcheck:
       test: [ 'NONE' ]
 
@@ -42,12 +41,14 @@ services:
     #command: php /var/www/artisan queue:listen --timeout=0
     # Production (working)
     command: php /var/www/artisan queue:work --timeout=0
+    ports: [ ]
     healthcheck:
       test: [ 'NONE' ]
 
   scheduler:
     <<: *app-service-template
     command: php /var/www/artisan schedule:work
+    ports: [ ]
     healthcheck:
       test: [ 'NONE' ]
 
@@ -80,11 +81,11 @@ services:
     restart: unless-stopped
 
   database:
-    image: postgres:alpine
+    image: postgres:18-alpine
     ports:
       - '${FORWARD_DB_PORT:-5432}:5432'
-    #volumes:
-    #  - db_data:/var/lib/postgresql/data
+    volumes:
+      - db_data:/var/lib/postgresql/18/docker
     environment:
       POSTGRES_USER: ${DB_USERNAME:-root}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}

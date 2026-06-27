@@ -1,6 +1,6 @@
 ####
 # Mago configuration
-# https://mago.carthage.software/tools/overview
+# https://mago.carthage.software/latest/en/tools/overview/
 ####
 #:schema https://mago.carthage.software/latest/schema.json
 version = "1"
@@ -45,20 +45,34 @@ no-unused-global = { enabled = true }
 no-unused-static = { enabled = true }
 no-dead-store = { enabled = true }
 no-redundant-else = { enabled = true }
+no-redundant-variable = { enabled = true }
+no-unused-closure-capture = { enabled = true }
+no-negated-ternary = { enabled = false }
+no-assign-in-argument = { enabled = false }
+no-fully-qualified-global-class-like = { enabled = false }
+no-fully-qualified-global-constant = { enabled = false }
+no-fully-qualified-global-function = { enabled = false }
+no-side-effects-with-declarations = { enabled = true }
 
 [analyzer]
 plugins = []
-find-unused-definitions = true
 find-unused-expressions = true
+find-unused-definitions = true
+find-overly-wide-return-types = true
 analyze-dead-code = true
 memoize-properties = true
-strict-array-index-existence = true
 check-throws = true
 unchecked-exceptions = ["Error", "LogicException"]
 unchecked-exception-classes = []
 check-missing-override = true
 find-unused-parameters = true
 strict-list-index-checks = true
+strict-array-index-existence = true
 no-boolean-literal-comparison = true
 check-missing-type-hints = true
+check-closure-missing-type-hints = true
+check-arrow-function-missing-type-hints = false
 register-super-globals = true
+check-use-statements = true
+check-name-casing = true
+enforce-class-finality = true
