@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: ./setup/docker/app/Dockerfile
-    command: bash /var/www/setup/docker/app/run.sh
+    command: sh /var/www/setup/docker/app/run.sh
     volumes:
       - .:/var/www
       # Alpine PHP
@@ -18,7 +18,7 @@ services:
       #- storage
       #- storage2
     healthcheck:
-      test: [ 'CMD', 'curl', 'http://localhost:8000/api/v1/health' ]
+      test: ['CMD', 'wget', '--tries=1', '--spider', 'http://127.0.0.1:8000/api/v1/health']
       interval: 30s
       timeout: 5s
       retries: 5
@@ -31,9 +31,9 @@ services:
     #command: php /var/www/artisan queue:listen --timeout=0
     # Production (working)
     command: php /var/www/artisan queue:work --timeout=0
-    ports: [ ]
+    ports: []
     healthcheck:
-      test: [ 'NONE' ]
+      test: ['NONE']
 
   queue_2:
     <<: *app-service-template
@@ -41,22 +41,22 @@ services:
     #command: php /var/www/artisan queue:listen --timeout=0
     # Production (working)
     command: php /var/www/artisan queue:work --timeout=0
-    ports: [ ]
+    ports: []
     healthcheck:
-      test: [ 'NONE' ]
+      test: ['NONE']
 
   scheduler:
     <<: *app-service-template
     command: php /var/www/artisan schedule:work
-    ports: [ ]
+    ports: []
     healthcheck:
-      test: [ 'NONE' ]
+      test: ['NONE']
 
   ssr:
     <<: *app-service-template
-    command: bash /var/www/setup/docker/app/ssr.sh
+    command: sh /var/www/setup/docker/app/ssr.sh
     healthcheck:
-      test: [ 'CMD', 'curl', 'http://localhost:13715/health' ]
+      test: ['CMD', 'wget', '--tries=1', '--spider', 'http://127.0.0.1:13714/up']
       interval: 30s
       timeout: 5s
       retries: 5
@@ -74,7 +74,7 @@ services:
     depends_on:
       - app
     healthcheck:
-      test: [ 'CMD', 'curl', 'http://localhost/api/v1/health' ]
+      test: ['CMD', 'wget', '--tries=1', '--spider', 'http://127.0.0.1/api/v1/health']
       interval: 30s
       timeout: 5s
       retries: 5
@@ -91,7 +91,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
       POSTGRES_DB: ${DB_DATABASE:-database}
     healthcheck:
-      test: [ 'CMD', 'pg_isready', '-q', '-d', '${DB_DATABASE:-database}', '-U', '${DB_USERNAME:-root}' ]
+      test: ['CMD', 'pg_isready', '-q', '-d', '${DB_DATABASE:-database}', '-U', '${DB_USERNAME:-root}']
       interval: 30s
       timeout: 5s
       retries: 5
@@ -106,7 +106,7 @@ services:
       POSTGRES_PASSWORD: ${DB_TESTING_PASSWORD:-password}
       POSTGRES_DB: ${DB_TESTING_DATABASE:-database}
     healthcheck:
-      test: [ 'CMD', 'pg_isready', '-q', '-d', '${DB_TESTING_DATABASE:-database}', '-U', '${DB_TESTING_USERNAME:-root}' ]
+      test: ['CMD', 'pg_isready', '-q', '-d', '${DB_TESTING_DATABASE:-database}', '-U', '${DB_TESTING_USERNAME:-root}']
       interval: 30s
       timeout: 5s
       retries: 5

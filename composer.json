@@ -26,10 +26,10 @@
 		"ext-simplexml": "*",
 
 		"jcupitt/vips": "^2.6.1",
-		"inertiajs/inertia-laravel": "^3.1",
+		"inertiajs/inertia-laravel": "^3.1.1",
 		"laravel/fortify": "^1.37.2",
-		"laravel/framework": "^13.13",
-		"laravel/octane": "^2.17.4",
+		"laravel/framework": "^13.20",
+		"laravel/octane": "^2.17.5",
 		"laravel/tinker": "^3.0.2",
 		"laravel/wayfinder": "^0.1.20"
 	},
@@ -38,14 +38,14 @@
 		"larastan/larastan": "@stable",
 		"maximal/gitlab-code-quality": "@stable",
 		"laravel/pail": "^1.2.7",
-		"laravel/pao": "^1.1.0",
+		"laravel/pao": "^1.1.2",
 		"mockery/mockery": "^1.6.12",
 		"nunomaduro/collision": "^8.9.4",
 		"pestphp/pest": "@stable",
 		"pestphp/pest-plugin-laravel": "@stable",
 		"psalm/plugin-laravel": "@stable",
 		"roave/security-advisories": "dev-latest",
-		"vimeo/psalm": "@beta"
+		"vimeo/psalm": "@stable"
 	},
 	"autoload": {
 		"psr-4": {

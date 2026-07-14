@@ -5,9 +5,11 @@ ARG USER=www
 # Install basic dependencies
 RUN apk update  &&  apk upgrade  &&  apk add --update --no-interactive \
 	# Basic packages \
-	curl icu-data-full \
+	icu-data-full \
+	# cURL \
+	#curl \
 	# Bash (for installing tools, like Bun) \
-	bash \
+	#bash \
 	# ZIP Tools \
 	zip unzip \
 	# 7ZIP Tools \
@@ -74,13 +76,14 @@ RUN install-php-extensions \
 	zip
 
 # Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer/composer:latest-bin /composer /usr/local/bin/composer
 
 # Install NodeJS
 #RUN apk add --no-interactive nodejs-current
 
 # Install Bun (instead of NodeJS)
-RUN curl -fsSL https://bun.sh/install | bash  &&  mv ~/.bun/bin/bun /usr/local/bin/bun
+COPY --from=oven/bun:alpine /usr/local/bin/bun /usr/local/bin/bun
+RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx
 
 # Clear caches
 RUN apk cache clean

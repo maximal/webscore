@@ -8,7 +8,7 @@ php-version = "8.5"
 
 [source]
 workspace = "."
-#paths = ["app", "database/factories", "database/seeders", "tests"]
+paths = ["app", "bootstrap", "config", "database", "routes", "tests"]
 includes = ["vendor"]
 excludes = ["bootstrap/cache", "storage"]
 
